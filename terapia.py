@@ -1,55 +1,62 @@
-import socket
-from threading import Thread
-import time
+import os
+import requests
+from bs4 import BeautifulSoup
 
-def send_data(sock):
-    while True:
-        command = input("Inserisci il comando: ")
-        sock.send(command.encode())
-
-def receive_data(sock):
-    while True:
-        data = sock.recv(1024).decode()
-        print(data)
-        if "position" in data:
-            # Estrai la posizione dall'input
-            position = data.split(':')¹.strip()
-            # Aggiungi la posizione alla pagina HTML
-            html += f"<p>Posizione: {position}</p>"
-        elif "audio" in data:
-            # Estrai l'audio dall'input
-            audio_data = data.split(':')².strip()
-            # Aggiungi l'audio alla pagina HTML
-            html += f"<audio controls><source src='data:audio/wav;base64,{audio_data}' type='audio/wav'></audio>"
-        elif "video" in data:
-            # Estrai la camera dall'input
-            video_data = data.split(':')³.strip()
-            # Aggiungi la camera alla pagina HTML
-            html += f"<video width='320' height='240' controls><source src='data:video/mp4;base64,{video_data}' type='video/mp4'></video>"
+def google_search(query):
+    url = "https://www.google.com/search?q=" + query
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    return soup.find_all('div', {'class': 'ZINbbc'})
 
 def main():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', 8080)) # Sostituisci l'indirizzo IP e il numero di porta con quelli desiderati
-    server_socket.listen(1)
+    print("OSINT Tool - Selezione un'opzione:")
+    print("1. Numero di telefono")
+    print("2. Indirizzo email")
 
-    print("Ascolto in corso...")
-    client_socket, addr = server_socket.accept()
-    print(f"Connesso a {addr}")
+    choice = input("Scegli un'opzione (1/2): ")
 
-    send_thread = Thread(target=send_data, args=(client_socket,))
-    receive_thread = Thread(target=receive_data, args=(client_socket,))
+    if choice == "1":
+        number = input("Inserisci il numero di telefono: ")
+        prefixed_numbers = {
+            "+39": ["393", "380", "348"],
+            "03": ["039", "0369"]
+            # aggiungi altri prefissi italiani qui
+        }
 
-    send_thread.start()
-    receive_thread.start()
+        for prefix, codes in prefixed_numbers.items():
+            if number.startswith(prefix):
+                print(f"Numero di telefono: {number}")
+                print("Esecuzione di OSINT...")
+                query = f"{prefix}{number} +italia"
+                results = google_search(query)
+                for result in results:
+                    print("-" * 20)
+                    name = result.find('span', {'class': 'LC20lb'}).text
+                    print(f"Nome: {name}")
+                    # ... estrai altre informazioni come necessario
 
-    html = "<html><body>"
-    while True:
-        time.sleep(1) # Aggiorna la pagina ogni secondo
-        print("Aggiornamento della pagina...")
-        html += "</body></html>"  # Chiudi il body e l'html
-        with open("page.html", "w") as file:
-            file.write(html)
-        print("Pagina aggiornata.")
+    elif choice == "2":
+        email = input("Inserisci l'indirizzo email: ")
+        prefixed_emails = {
+            "@gmail.com": ["@hotmail.it", "@yahoo.it"],
+            "@libero.it": ["@virgilio.it"]
+            # aggiungi altri prefissi italiani qui
+        }
+
+        for prefix in prefixed_emails.keys():
+            if email.endswith(prefix):
+                print(f"Indirizzo email: {email}")
+                print("Esecuzione di OSINT...")
+                query = f"{email} +italia"
+                results = google_search(query)
+                for result in results:
+                    print("-" * 20)
+                    name = result.find('span', {'class': 'LC20lb'}).text
+                    print(f"Nome: {name}")
+                    # ... estrai altre informazioni come necessario
+
+    else:
+        print("Opzione non disponibile. Prova di nuovo.")
 
 if __name__ == "__main__":
     main()
