@@ -1,5 +1,6 @@
 import requests
 import re
+from termcolor import colored
 
 def get_info(target):
     # Fetch IP address
@@ -18,26 +19,22 @@ def get_info(target):
     admin_details = admin_data['data']
 
     # Display results in a formatted table
-    print("\n┌───────────────┐")
-    print(f"│ {Figlet().render('HAGG4R')} │")
-    print("└───────────────┘\n")
-    print(f"\t{target}\t")
-    print("\n┌───────────────┐")
-    print("│ IP Address:   │")
-    print(f"│ {ip_address}  │")
-    print("└───────────────┘\n")
-
-    print("\n┌───────────────┐")
-    print("│ Email Addresses: │")
-    print("└───────────────┘\n")
+    print("\n" + colored("------------------------", "red") + "\n")
+    print(colored("┌───────────────┐", "yellow") + "\n")
+    print(colored(f"│ {Figlet().render('HAGG4R')} │", "green") + "\n")
+    print(colored("└───────────────┘\n\t{target}\t", "cyan"))
+    print(colored("------------------------\n┌───────────────┐", "red"))
+    print(colored("│ IP Address:   │", "yellow"))
+    print(colored(f"│ {ip_address}  │", "green") + "\n")
+    print(colored("------------------------\n┌───────────────┐", "red"))
+    print(colored("│ Email Addresses: │", "yellow"))
     for email in email_addresses:
-        print(f"\t{email}\n")
-
-    print("\n┌───────────────┐")
-    print("│ Admin Details:  │")
-    print("└───────────────┘\n")
+        print(colored("\t{email}", "cyan") + "\n")
+    print(colored("------------------------\n┌───────────────┐", "red"))
+    print(colored("│ Admin Details:  │", "yellow"))
     for detail in admin_details:
-        print(f"\t{detail}\n")
+        print(colored(f"\t{detail}", "cyan") + "\n")
+    print(colored("------------------------", "red"))
 
 # Prompt user for target
 target = input("Enter the target's name: ")
