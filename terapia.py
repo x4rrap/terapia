@@ -1,4 +1,3 @@
-
 import requests
 import re
 
@@ -19,17 +18,26 @@ def get_info(target):
     admin_details = admin_data['data']
 
     # Display results in a formatted table
-    print(f"Target: {target}")
-    print("IP Address:")
-    print(f"{ip_address}\n")
+    print("\n┌───────────────┐")
+    print(f"│ {Figlet().render('HAGG4R')} │")
+    print("└───────────────┘\n")
+    print(f"\t{target}\t")
+    print("\n┌───────────────┐")
+    print("│ IP Address:   │")
+    print(f"│ {ip_address}  │")
+    print("└───────────────┘\n")
 
-    print("Email Addresses:")
+    print("\n┌───────────────┐")
+    print("│ Email Addresses: │")
+    print("└───────────────┘\n")
     for email in email_addresses:
-        print(f"{email}\n")
+        print(f"\t{email}\n")
 
-    print("Admin Details:")
+    print("\n┌───────────────┐")
+    print("│ Admin Details:  │")
+    print("└───────────────┘\n")
     for detail in admin_details:
-        print(f"{detail}\n")
+        print(f"\t{detail}\n")
 
 # Prompt user for target
 target = input("Enter the target's name: ")
