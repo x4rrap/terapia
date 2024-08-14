@@ -8,6 +8,24 @@ def google_search(query):
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup.find_all('div', {'class': 'ZINbbc'})
 
+def extract_account_info(account):
+    account_info = {}
+    soup = BeautifulSoup(requests.get("https://twitter.com/" + account).text, 'html.parser')
+    try:
+        name = soup.find('span', {'class': 'b-0'}).text
+        account_info['name'] = name
+    except AttributeError:
+        pass
+
+    soup = BeautifulSoup(requests.get("https://www.facebook.com/" + account).text, 'html.parser')
+    try:
+        about = soup.find('div', {'class': '_6qdp7'}).find('p').text
+        account_info['about'] = about
+    except AttributeError:
+        pass
+
+    return account_info
+
 def main():
     print("OSINT Tool - Selezione un'opzione:")
     print("1. Numero di telefono")
@@ -33,7 +51,26 @@ def main():
                     print("-" * 20)
                     name = result.find('span', {'class': 'LC20lb'}).text
                     print(f"Nome: {name}")
-                    # ... estrai altre informazioni come necessario
+
+                    account_links = [a['href'] for a in result.find_all('a')]
+                    for link in account_links:
+                        if "twitter.com/" in link:
+                            twitter_account = link.split("/")[-1]
+                            print("Twitter account:", twitter_account)
+                            twitter_info = extract_account_info(twitter_account)
+                            if 'name' in twitter_info:
+                                print(f"Name: {twitter_info['name']}")
+                            if 'about' in twitter_info:
+                                print(f"About: {twitter_info['about']}")
+
+                        elif "facebook.com/" in link:
+                            facebook_account = link.split("/")[-1]
+                            print("Facebook account:", facebook_account)
+                            facebook_info = extract_account_info(facebook_account)
+                            if 'name' in facebook_info:
+                                print(f"Name: {facebook_info['name']}")
+                            if 'about' in facebook_info:
+                                print(f"About: {facebook_info['about']}")
 
     elif choice == "2":
         email = input("Inserisci l'indirizzo email: ")
@@ -53,7 +90,26 @@ def main():
                     print("-" * 20)
                     name = result.find('span', {'class': 'LC20lb'}).text
                     print(f"Nome: {name}")
-                    # ... estrai altre informazioni come necessario
+
+                    account_links = [a['href'] for a in result.find_all('a')]
+                    for link in account_links:
+                        if "twitter.com/" in link:
+                            twitter_account = link.split("/")[-1]
+                            print("Twitter account:", twitter_account)
+                            twitter_info = extract_account_info(twitter_account)
+                            if 'name' in twitter_info:
+                                print(f"Name: {twitter_info['name']}")
+                            if 'about' in twitter_info:
+                                print(f"About: {twitter_info['about']}")
+
+                        elif "facebook.com/" in link:
+                            facebook_account = link.split("/")[-1]
+                            print("Facebook account:", facebook_account)
+                            facebook_info = extract_account_info(facebook_account)
+                            if 'name' in facebook_info:
+                                print(f"Name: {facebook_info['name']}")
+                            if 'about' in facebook_info:
+                                print(f"About: {facebook_info['about']}")
 
     else:
         print("Opzione non disponibile. Prova di nuovo.")
